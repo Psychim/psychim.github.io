@@ -1,0 +1,54 @@
+---
+layout: post
+title:  "GloVe: Global Vectos for Word Representation"
+categories: paper
+---
+# Related Work
+词表示学习分为两大方法：Matrix Factorization Methods 和 Shallow Window-based Methods。MFM包括LSA、HAL等。MFM利用低阶近似分解含有语料库统计信息的大矩阵。HAL等方法的主要问题是频繁词对近似度量的贡献过大（如the、and含有很少的语义信息）。COALS、PPMI转换、HPCA解决了这个问题。SWM通过在局部上下文窗口中进行预测来学习词表示，如Bengio ea al.(2003)、CBOW、Skip-gram、vLBL、ivLBL等。这些模型能将语言模式用词向量之间的线性关系表现出来，缺点是不能利用语料库整体的统计信息。
+# The GloVe Model
+## 推导
+设$X_{ij}$为词语j出现在词语i的上下文中的次数，$X_i=\sum_kX_{ik}$表示词语i的上下文总词数，$P_{ij}=P(j|i)=X_{ij}/X_i$表示词语j出现在词语i的上下文中的概率。  
+考虑三个词语i, j, k，若k与i相关而与j无关，那么比值$P_{ik}/P_{jk}$较大；若k与i无关，与j有关，该比值较小；若k与两者都相关或无关，那么该比值接近1。（为什么？感觉应该是未定义）这个比值比概率更能区分相关词和无关词。（为什么？）  
+令该比值为词向量的函数，即$F(w_i,w_j,\tilde{w_k})=\frac{P_ik}{P_jk}$。由于向量空间是线性结构，可通过向量差将该比值的信息编码进向量空间。故可将F范围缩小至$F(w_i-w_j,\tilde{w_k})$。接着，F的参数是向量而值域是标量。故可简单地采用内积将参数化为标量（保证向量空间的线性结构）：$F((w_i-w_j)^T\tilde{w_k})$。  
+在共现矩阵中，词语和上下文词语之间的差别是任意的，两者应是可交换的。故$w \leftrightarrow\tilde{w}$和$X\leftrightarrow X^T$都应是可替换的。首先可令F是群$(R,+)$和$(R_{>0},\times)$的同态：$F((w_i-w_j)^T\tilde{w_k})=\frac{F(w_i^T\tilde{w_k})}{F(w_j^T\tilde{w_k})}$。根据前文，$F(w_i^T\tilde{w_k})=P_{ik}=\frac{X_ik}{X_i}$，得到解$F=exp$，或
+$$w_i^T\tilde{w_k}=\log(P_{ik})=\log(X_{ik})-\log(X_i)$$  
+（看不懂）。  
+如果没有$\log(X_i)$，则最后一个式子具有交换对称性。该项独立于k，故可吸收进$w_i$的一个偏置$b_i$，并加入$\tilde{b_k}$保持对成性得到：
+$$w_i^T\tilde{w_k}+b_i+\tilde{b_k}=\log(X_{ik})$$   
+这个模型存在两个问题：$X_{ik}$接近0时其对数值会发散，而零值通常占了X的75%-95%（可通过$\log(1+X_{ij})$解决）；所有共现的权重相同，而稀少的共现可能是噪声，信息量少。故引入权重函数$f(X_{ij})$得到损失函数：$J=\sum^V_{i,j=1}{f(X_{ij})}(w_i^T\tilde{w_j}+b_i+\tilde{b_j}-\log{X_{ij}})^2$  
+函数f应满足3个性质：(1) $f(0)=0$，且如果f连续，则$\lim_{x \rightarrow 0}f(x)\log^2{x}$应有限；(2)f(x)非减；(3)x较大时，$f(x)$不能太大。  
+可令
+$$f(x)=\left\{
+\begin{array}{rcl}
+(x/x_{max})^\alpha & if\ x < x_{max} &\\
+1 & otherwise &.
+\end{array}
+\right.$$  
+$x_{max}$的取值影响不大，而$\alpha=3/4$较好。
+## 与其它模型的关系
+skip-gram等模型的全局目标函数可写作：
+$$
+Q_{ij}=\frac{exp(w_i^T\tilde{w_j})}{\sum^V_{k=1}exp(w_i^T\tilde{w_k})}\\
+\begin{array}{rcl}
+J&=&-\sum_{i\in corpus,j\in context(i)}\log{Q_{ij}}\\
+&=&-\sum^V_{i=1}\sum^V_{j=1}{X_{ij}\log{Q_{ij}}}\\
+&=&-\sum^V_{i=1}X_i \sum^V_{j=1}{P_{ij}\log{Q_{ij}}}\\
+&=&\sum^V_{i=1}{X_i}H(P_i,Q_i)
+\end{array}$$
+该式有一些不太好的性质：交叉熵建模可能导致小概率时间被赋予过多的权重；为了令度量有界，模型分布Q需要标准化，导致了需要在词典上求和，带来了计算瓶颈。为了避免标准化，可采用其它距离度量（替换交叉熵），比如最小二乘：
+$$\hat{J}=\sum_{i,j}X_i(\hat{P_{ij}}-\hat{Q_{ij}})^2$$
+其中，$\hat{P_{ij}}=X_{ij}$，$\hat{Q_{ij}}=exp(w_i^T\tilde{w_j})$。由于$\hat{P_{ij}}$可能很大，可对两者同取对数。另外，$X_i$可看作权重。Mikolov et al.(2013)提到通过限制该权重值的最大值可改善模型表现。故可将该权重用更加泛化的权重函数$f(X_{ij})$替换，最后得到的式子的形式就与前文推导得到的目标函数相同。  上述比较可看出，GloVe的目标函数改善了skip-gram等模型目标函数的一些缺点。
+## 计算复杂度
+GloVe的计算复杂度大概是$O(|C|^{0.8})$，优于skip-gram的$O(|C|)$
+# 其它要点
+共现矩阵的统计：相隔d个词语的词语对，计为1/d次  
+两种类型的词向量w和$\tilde{w}$在X对称时是等价的，不同点只取决于随机初始化。  
+对于特定类型的神经网络，结合多个训练实例得到的结果可改善过拟合和噪声等问题。  
+结合上述两点，可采用$w+\tilde{w}$作为词向量。  
+The fact that this basic SVD model does not scale well to large corpora lends further evidence to the necessity of the type of weighting scheme proposed in our model.  
+## 向量大小对词的影响
+300维以上，词向量在类比任务上的性能提升就变得很微小
+## 上下文窗口大小的影响
+小窗口就可以较好地学习到词法特征；而学习语义特征最好使用大窗口
+# 备注
+homomorphism 同态
