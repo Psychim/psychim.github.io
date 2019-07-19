@@ -2,9 +2,12 @@
 layout: post
 title:  "向量和矩阵的梯度"
 categories: math
+excerpts: "# 综述
+一般而言，$n_1$维张量对$n_2$维张量的梯度有$n_1+n_2$维"
 ---
 # 综述
 一般而言，$n_1$维张量对$n_2$维张量的梯度有$n_1+n_2$维
+---
 # 向量对向量的梯度
 向量对向量的梯度由Jacobian矩阵计算：
 $$\frac{\partial \overrightarrow{f}}{\partial \overrightarrow{x}}=\left[
@@ -34,7 +37,7 @@ $$
 设$\overrightarrow{x}$为维度a的向量，$W$为$b\times a$的矩阵
 $$若\overrightarrow{y}=W\overrightarrow{x},那么\frac{d\overrightarrow{y}}{d\overrightarrow{x}}=W$$  
 $$若\overrightarrow{y}=\overrightarrow{x}^TW^T,那么\frac{d\overrightarrow{y}}{d\overrightarrow{x}}=W$$  
-$$若\overrightarrow{y}=\overrightarrow{x},那么\frac{d \overrightarrow{y}}{d \overrightarrow{x}}=\bold{I}$$
+$$若\overrightarrow{y}=\overrightarrow{x},那么\frac{d \overrightarrow{y}}{d \overrightarrow{x}}=I$$
 $$若\overrightarrow{y}=f(\overrightarrow{x}),f是一逐元素作用的函数,那么\frac{d \overrightarrow{y}}{d \overrightarrow{x}}=diag(f'(\overrightarrow{x}))$$
 # 向量对矩阵的梯度
 ## 实例
