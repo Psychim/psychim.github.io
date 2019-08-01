@@ -1,24 +1,29 @@
 ---
 layout: post
-title:  "向量和矩阵的梯度"
+title:  "向量和矩阵的微分"
 categories: math
-excerpts: "# 综述
-一般而言，$n_1$维张量对$n_2$维张量的梯度有$n_1+n_2$维"
+tags: math
 ---
 # 综述
-一般而言，$n_1$维张量对$n_2$维张量的梯度有$n_1+n_2$维
----
-# 向量对向量的梯度
-向量对向量的梯度由Jacobian矩阵计算：
+微分是函数，其自变量是原函数自变量发生的微小变化，其值是函数值随其发生的变化量。  
+<!-- more><!-->
+梯度是向量，其第i个分量是函数值对自变量的第i个分量的偏分，故梯度只在$f: R^n\rightarrow R$上有定义。  
+偏分是梯度的分量，也是函数。
+Jacobian矩阵定义在所有函数上，对$f:R^n\rightarrow R^m$，有：  
 $$\frac{\partial \overrightarrow{f}}{\partial \overrightarrow{x}}=\left[
 \begin{array}{rcl}
 \frac{\partial f_1}{\partial x_1} & \cdots & \frac{\partial f_1}{\partial x_n}\\
 \vdots & \ddots & \vdots \\
 \frac{\partial f_m}{\partial x_1} & \cdots & \frac{\partial f_m}{\partial x_n}
 \end{array}
-\right]$$
+\right]$$  
+一般而言，$n_1$维张量对$n_2$维张量的Jacobian矩阵有$n_1+n_2$维。   
+对$f: R^n\rightarrow R$而言，Jacobian矩阵退化为一个向量，梯度是它的转置。  
+链式法则是作用在Jacobian矩阵上的。
+# 向量对向量
+
 ## Jacobian矩阵在链式法则中的应用
-若有函数$\overrightarrow{f}(x)$和函数$\overrightarrow{g}(\overrightarrow{f})$，那么
+若有函数$\overrightarrow{f}(x)$和函数$\overrightarrow{g}(\overrightarrow{f})$，那么  
 $$\frac{\partial \overrightarrow{g}}{\partial x}=\frac{\partial \overrightarrow{g}}{\partial\overrightarrow{f}}\frac{\partial \overrightarrow{f}}{\partial x}=
 \left[
     \begin{array}{rcl}
@@ -34,17 +39,17 @@ $$\frac{\partial \overrightarrow{g}}{\partial x}=\frac{\partial \overrightarrow{
 \right]
 $$
 ## 实例
-设$\overrightarrow{x}$为维度a的向量，$W$为$b\times a$的矩阵
+设$\overrightarrow{x}$为维度a的向量，$W$为$b\times a$的矩阵  
 $$若\overrightarrow{y}=W\overrightarrow{x},那么\frac{d\overrightarrow{y}}{d\overrightarrow{x}}=W$$  
 $$若\overrightarrow{y}=\overrightarrow{x}^TW^T,那么\frac{d\overrightarrow{y}}{d\overrightarrow{x}}=W$$  
-$$若\overrightarrow{y}=\overrightarrow{x},那么\frac{d \overrightarrow{y}}{d \overrightarrow{x}}=I$$
-$$若\overrightarrow{y}=f(\overrightarrow{x}),f是一逐元素作用的函数,那么\frac{d \overrightarrow{y}}{d \overrightarrow{x}}=diag(f'(\overrightarrow{x}))$$
-# 向量对矩阵的梯度
+$$若\overrightarrow{y}=\overrightarrow{x},那么\frac{d \overrightarrow{y}}{d \overrightarrow{x}}=I$$  
+$$若\overrightarrow{y}=f(\overrightarrow{x}),f是一逐元素作用的函数,那么\frac{d \overrightarrow{y}}{d \overrightarrow{x}}=diag(f'(\overrightarrow{x}))$$  
+# 向量对矩阵
 ## 实例
-设$\overrightarrow{x}$为维度a的向量，$W$为$b\times a$的矩阵
+设$\overrightarrow{x}$为维度a的向量，$W$为$b\times a$的矩阵  
 $$若\overrightarrow{y}=W\overrightarrow{x},
 那么\frac{\partial\overrightarrow{y_i}}{\partial\overrightarrow{W_{j,i}}}=\overrightarrow{x_j},其余项为0$$
-# 矩阵对矩阵的梯度
+# 矩阵对矩阵
 ## 实例
-设$X$为维度$a\times b$的向量，$W$为$b\times c$的矩阵
+设$X$为维度$a\times b$的向量，$W$为$b\times c$的矩阵  
 $$若Y=XW,那么\frac{\partial Y_{i,j}}{\partial X_{i,k}}=W_{k,j}=W^T_{j,k},或\frac{\partial Y_{i,:}}{\partial X_{i,:}}=W,其余项为0$$

@@ -2,6 +2,7 @@
 layout: post
 title:  "Improving Distributional Similarity with Lessons Learned from Word Embeddings"
 categories: paper
+tags: paper word-embedding
 ---
 # 摘要
 本文揭示了词向量的优秀表现源于特定的系统设计和超参数优化，而非算法本身。而且，这些方法可以被挪用至传统分布式模型，得到相似的优化。本文还观察到不同方法之间的表现差异大部分是局部的、不显著的。
@@ -11,17 +12,17 @@ categories: paper
 另外，这种context的定义叫作bag-of-word contexts
 ## PMI(Pointwise Mutual Information)矩阵
 
-$$PMI(x;y)=\log{\frac{p(x,y)}{p(x)p(y)}}=\log{\frac{p(x|y)}{p(x)}}=\log{\frac{p(y|x)}{p(y)}}$$
+$$PMI(x;y)=\log{\frac{p(x,y)}{p(x)p(y)}}=\log{\frac{p(x|y)}{p(x)}}=\log{\frac{p(y|x)}{p(y)}}$$  
 如果x和y无关，则$p(x,y)=p(x)p(y)$；否则，若相关度越高，$\frac{p(x,y)}{p(x)p(y)}$越大。
 故该值衡量了是x和y的相关度。  
-共现矩阵是由元素$X_{ij}$构成的矩阵，$X_{ij}$为词语j出现在词语i的上下文中的次数（或词语i与上下文词语j共现的次数）。
-PMI矩阵由共现矩阵得到：
-$$PMI(i,j)=\log{\frac{\hat{P(i,j)}}{\hat{P(i)}\hat{P(j)}}}=\log{\frac{X_{ij}|D|}{X_iX_j}}$$
-|D|是共现对总数。
-而`PPMI(positive PMI)`为：$PPMI(i,j)=max(PMI(i,j),0)$
+共现矩阵是由元素$X_{ij}$构成的矩阵，$X_{ij}$为词语j出现在词语i的上下文中的次数（或词语i与上下文词语j共现的次数）。  
+PMI矩阵由共现矩阵得到：  
+$$PMI(i,j)=\log{\frac{\hat{P(i,j)}}{\hat{P(i)}\hat{P(j)}}}=\log{\frac{X_{ij}|D|}{X_iX_j}}$$  
+|D|是共现对总数。  
+而`PPMI(positive PMI)`为：$PPMI(i,j)=max(PMI(i,j),0)$  
 `PPMI`在语义相似性任务上的表现要好于`PMI`。但两者都有一个缺点：即对小概率事件的偏好。
 ## SVD(Singular Value Decomposition)
-trancated SVD可对矩阵降维得到词向量。  
+trancated SVD可对矩阵降维得到词向量。    
 SVD将矩阵M分解为$U\cdot\Sigma\cdot V^T$，其中U、V正交，$\Sigma$是特征值对角阵，降序排列。通过只保留$\Sigma$的前d个元素可实现矩阵的降维。新矩阵$M_d=U_d\cdot\Sigma_d\cdot V^T$可保留原矩阵的大部分信息。  
 $W=U_d\cdot\Sigma_d$可作为词向量的行，因为该矩阵行之间的点乘与$M_d$的行之间点乘相同。而$V_d$的行可作为上下文向量。
 ## SGNS(Skip-Grams with Negative Sampling)

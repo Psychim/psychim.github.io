@@ -1,0 +1,20 @@
+---
+layout: post
+title:  "BPE计算的优化"
+categories: code
+tags: code bpe
+---
+*Neural Machine Translation of Rare Words with Subword Units* 这篇paper里给出的BPE代码只能用来阐述BPE的概念，实际使用时效率过低。本文记录几个可以优化的地方。
+# 优化点一
+BPE每次合并一对subword a和b，只影响了a，b以及ab相关的pair的频率，因此不需要每次迭代都重新统计所有pair的频率。  
+通过遍历一遍词表，找到单词w中a和b连续出现的位置i和i+1，那么可以更新pair频率表为：
+$$freq(w[i-1],w[i])-=freq(w)$$  
+$$freq(w[i+1],w[i+2])-=freq(w)$$  
+$$freq(w[i]w[i+1],w[i+2])+=freq(w)$$
+$$freq(w[i-1],w[i]w[i+1])+=freq(w)$$
+$$freq(a,b)=0$$  
+于是为了避免每次遍历词表，就可以在统计和更新pair频率的同时，用set维护这个pair的词语集合。
+## 注意点
+更新完一处的频率后，必须立刻替换"a b"为"ab"，否则当合并的pair类似"aa"时，遇到"a a a a"这样的序列，更新就会不正确。  
+# 优化点二
+每次求取频率最大的pair时，需要遍历一遍pair表，可改用一个大顶堆来维护。

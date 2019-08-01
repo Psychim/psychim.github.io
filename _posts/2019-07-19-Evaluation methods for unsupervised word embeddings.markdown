@@ -2,6 +2,7 @@
 layout: post
 title:  "Evaluation methods for unsupervised word embeddings"
 categories: paper
+tags: paper word-embedding
 ---
 # 摘要
 本文研究了无监督词向量的评价方法。
