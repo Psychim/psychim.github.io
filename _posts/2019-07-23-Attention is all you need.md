@@ -15,11 +15,23 @@ Encoder有$N=6$层。每层是一个多头自注意力子层(multi-head self-att
 $$LayerNorm(x+Sublayer(x))$$  
 Sublayer(x)是当前子层的输出。残差连接就是这里额外加上的x。  
 Encoder的输入是词语序列，每个词用Word Embedding与Positional Encoding的和表示，输出是同样维度，同样长度的向量序列。  
+$$H_0=Embedding(Source)+PE(Source)$$  
+$$H_i^{(1)}=LayerNorm\left(H_{i-1}+MultiHead(H_{i-1},H_{i-1},H_{i-1})\right)$$  
+$$H_i^{(2)}=LayerNorm\left(H_{i}^{(1)}+FFN(H_i^{(1)})\right)$$  
+$$H_i=H_i^{(2)}$$
 ## Decoder
 在Encoder的基础上，每层中间插入了一个多头注意力子层，用encoder的输出作为Key和Value。而原先的注意力子层通过加Mask，避免attend到了还未被计算的位置。  
-Decoder的输入是已预测的词语序列，同样用Word Embedding+Positional Encoding表示每个词语。输出是下一个词语的概率。因此若待预测句子长度为L，Decoder也需要计算L次。
+Decoder的输入是已预测的词语序列，同样用Word Embedding+Positional Encoding表示每个词语。输出是下一个词语的概率。因此若待预测句子长度为L，Decoder也需要计算L次。  
+$$Target_0='<Start>'$$  
+$$ S_{i,0}=Embedding(Target_{i-1})+PE(Target_{i-1})$$  
+$$S_{i,j}^{(1)}=LayerNorm(S_{i,j-1}+MutliHead(S_{i,j-1},S_{i,j-1},S_{i,j-1},Mask_i))$$  
+$$S_{i,j}^{(2)}=LayerNorm(S_{i,j}^{(1)}+MultiHead(S_{i,j}^{(1)},H_N,H_N))$$   
+$$S_{i,j}^{(3)}=LayerNorm(S_{i,j}^{(2)}+FFN(S_{i,j}^{(2)}))$$  
+$$S_{i,j}=S_{i,j}^{(3)}$$  
 ## 预测
 一个全连接+一个softmax
+$$ NextWord_i=\argmax\left(Softmax(FFN(S_{i,j,i}))\right)$$  
+$$ Target_i=Concat(Target_{i-1},NextWord_i)$$  
 ## Attention层
 本文使用的注意力层基于Multi-Head Scaled Dot-Product Attention。
 ### Scaled Dot-Product Attention

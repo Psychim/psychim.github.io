@@ -4,6 +4,8 @@ title:  "Modeling Coverage for Neural Machine Translation"
 categories: paper
 tags: paper nmt
 ---
+# Reference
+[Modeling Coverage for Neural Machine Translation](https://www.aclweb.org/anthology/P16-1008)
 # 摘要
 注意力机制容易忽视过去的对齐信息，导致过额翻译或欠额翻译。本文提出coverage mechanism，通过维护一个coverage向量，跟踪注意力历史，提高NMT系统对未翻译的词语的考虑。
 # 动机
@@ -17,7 +19,7 @@ $$C_{i,j}=g_{update}(C_{i-1,j},\alpha_{i,j},\Phi(h_j),\Psi)$$
 
 ## Linguistic Coverage Model
 $$C_{i,j}=C_{i-1,j}+\frac{1}{\Phi_j}\alpha_{i,j}=\frac{1}{\Phi_j}\sum^i_{k=1}\alpha_{k,j}$$  
-- $\Phi_j$是预定义的权重，表示词语$x_j$期望被翻译的次数。可定义为：$\Phi_j=N\cdot \sigma(U_fh_j)$。其中N为最大次数，$\sigma(\cdot)$是sigmoid函数，$U_f$是权重矩阵。
+- $\Phi_j$是预定义的权重，表示词语$x_j$期望被翻译的次数。可定义为：$\Phi_j=N\cdot \sigma(U_fh_j)$ (Fertility)。其中N为最大次数，$\sigma(\cdot)$是sigmoid函数，$U_f$是权重矩阵。
 
 ## Neural Network Based Coverage Model
 可用一个RNN来迭代$C_{i,j}$  

@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "Dependency Parsing笔记"
-categories: "dependency parsing"
-tags: dependency-parsing
+categories: notes
+tags: dependency-parsing notes
 ---
 # 语法结构
 语法结构分为两种：constituency structures和dependency structures  
